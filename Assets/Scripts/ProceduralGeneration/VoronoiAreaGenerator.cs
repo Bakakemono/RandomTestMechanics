@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class AreaGenerator : MonoBehaviour
+public class VoronoiAreaGenerator : MonoBehaviour
 {
     struct Point
     {
@@ -12,7 +12,7 @@ public class AreaGenerator : MonoBehaviour
     }
 
     [SerializeField] private string seed = "Hello";
-
+    [SerializeField] private bool drawAreaCenter = false;
 
     [SerializeField] private Vector2Int mapSize = new Vector2Int(100, 100);
     [SerializeField] private int areaNumber = 10;
@@ -47,7 +47,7 @@ public class AreaGenerator : MonoBehaviour
             Point area;
             area.postion = new Vector2Int(Random.Range(0, mapSize.x), Random.Range(0, mapSize.y));
             area.child = new List<Point>();
-            
+
             areaList.Add(area);
             areaColor[i] = new Color(Random.value, Random.value, Random.value);
         }
@@ -67,37 +67,50 @@ public class AreaGenerator : MonoBehaviour
             }
             areaList[areaIndex].child.Add(point);
         }
+        
     }
 
     void OnDrawGizmos()
     {
-        if(areaColor.Length == 0)
+        Draw();
+    }
+
+
+    void Draw()
+    {
+        if (areaColor.Length == 0)
             return;
+
+        Debug.Log("Draw");
         for (int i = 0; i < areaNumber; i++)
         {
             Gizmos.color = areaColor[i];
 
             foreach (Point point in areaList[i].child)
             {
-                Gizmos.DrawCube(point.postion + Vector2.one / 2, new Vector2(1, 1));
+                Gizmos.DrawCube(point.postion + Vector2.one / 2, Vector3.one);
             }
-            Gizmos.DrawWireSphere(areaList[i].postion + Vector2.one / 2, 1);
         }
+        if (drawAreaCenter)
+            for (int i = 0; i < areaNumber; i++)
+            {
+                Gizmos.DrawWireSphere(areaList[i].postion + Vector2.one / 2, 1);
+            }
     }
-
-
 }
 
-[CustomEditor(typeof(AreaGenerator))]
+
+[CustomEditor(typeof(VoronoiAreaGenerator))]
 public class AreaGeneratorCustomInspector : Editor
 {
     public override void OnInspectorGUI()
     {
-        AreaGenerator areaGenerator = (AreaGenerator)target;
+        VoronoiAreaGenerator areaGenerator = (VoronoiAreaGenerator)target;
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Generate"))
         {
+            Debug.Log("Press");
             areaGenerator.StartGeneration();
         }
 
