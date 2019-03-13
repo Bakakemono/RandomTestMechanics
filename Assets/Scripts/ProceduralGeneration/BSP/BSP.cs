@@ -181,16 +181,16 @@ public class BSPCustomInspector : Editor
 {
     public override void OnInspectorGUI()
     {
-        BSP myTarget = (BSP)target;
+        BSP bsp = (BSP)target;
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Reset"))
         {
-            myTarget.ResetBSP();
+            bsp.ResetBSP();
         }
         if (GUILayout.Button("Generate"))
         {
-            myTarget.DoBSP();
+            bsp.DoBSP();
         }
         EditorGUILayout.EndHorizontal();
 
