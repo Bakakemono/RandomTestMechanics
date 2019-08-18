@@ -1,18 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
-public class BSP : MonoBehaviour
+public class BSP_Generation : MonoBehaviour
 {
-    public void DoBSP()
+    void Start()
     {
         StartBSP();
-    }
-
-    public void ResetBSP()
-    {
-        ResetList();
+        GenerateMap(alphaRoom);
     }
 
     struct Room
@@ -22,6 +17,8 @@ public class BSP : MonoBehaviour
 
         public List<Room> child;
     }
+
+    [SerializeField] private bool draw = true;
 
     private Room alphaRoom;
     [SerializeField] private Vector2 alphaRoomSize = new Vector2(100, 100);
@@ -38,7 +35,6 @@ public class BSP : MonoBehaviour
     [Range(0, 100)] [SerializeField] private float splitLuckX = 20;
     [Range(0, 100)] [SerializeField] private float splitLuck = 20;
 
-    private GameObject World = new GameObject();
 
     [SerializeField] private GameObject wall;
 
@@ -51,7 +47,6 @@ public class BSP : MonoBehaviour
 
     private void StartBSP()
     {
-
         if (minSplitRange > maxSplitRange || minRoomSizeX > maxRoomSizeX || minRoomSizeY > maxRoomSizeY)
         {
             Debug.LogError("ONE OR MORE OF YOUR RANGE IS NOT COHERENT (MIN < MAX !!!)");
@@ -130,7 +125,7 @@ public class BSP : MonoBehaviour
         newRoomTwo.child.AddRange(Split(newRoomTwo));
 
         newRooms.Add(newRoomTwo);
-        
+
         return newRooms;
     }
 
@@ -162,9 +157,32 @@ public class BSP : MonoBehaviour
         return newRooms;
     }
 
+    void GenerateMap(Room room)
+    {
+        if (room.child.Count > 0)
+        {
+            foreach (Room childRoom in room.child)
+            {
+                GenerateMap(childRoom);
+            }
+        }
+        
+        for (int i = 0; i < room.size.x; i++)
+        {
+            Instantiate(wall, new Vector3(room.position.x - room.size.x / 2 + i, room.position.y - room.size.y / 2) + new Vector3(1, 1) / 2, Quaternion.identity);
+
+        }
+
+        for (int i = 1; i < room.size.y; i++)
+        {
+            Instantiate(wall, new Vector3(room.position.x - room.size.x / 2, room.position.y - room.size.y / 2 + i) + new Vector3(1, 1) / 2, Quaternion.identity);
+        }
+    }
 
     void OnDrawGizmos()
     {
+        if(!draw)
+            return;
         DrawRoom(alphaRoom);
     }
 
@@ -184,28 +202,7 @@ public class BSP : MonoBehaviour
                 DrawRoom(roomChild);
             }
         }
-            
+
     }
-}
 
-[CustomEditor(typeof(BSP))]
-public class BSPCustomInspector : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        BSP bsp = (BSP)target;
-
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Reset"))
-        {
-            bsp.ResetBSP();
-        }
-        if (GUILayout.Button("Generate"))
-        {
-            bsp.DoBSP();
-        }
-        EditorGUILayout.EndHorizontal();
-
-        DrawDefaultInspector();
-    }
 }

@@ -46,3 +46,12 @@ TagManager:
   - name: Eye
     uniqueID: 287259499
     locked: 0
+  - name: Road
+    uniqueID: 3012497523
+    locked: 0
+  - name: Building
+    uniqueID: 2091787925
+    locked: 0
+  - name: Fighter
+    uniqueID: 3168225695
+    locked: 0
